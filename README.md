@@ -3,4 +3,4 @@ Orden de ejecucion de codigo:
 2º predict
 3º app
 
-Prollecto utiliza Streamlit
+Proyecto utiliza Streamlit
