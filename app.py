@@ -3,8 +3,8 @@ import streamlit as st
 from streamlit_folium import folium_static
 import pandas as pd
 import numpy as np
-import datetime
 import os
+from datetime import datetime, timedelta
 
 # Cargar el CSV con datos de estaciones y coordenadas
 file_path = '3707499.csv'
@@ -24,8 +24,6 @@ def actualizar_mapa(estacion_seleccionada):
     for estacion, coords in estaciones.items():
         if estacion == estacion_seleccionada:
             folium.Marker(location=coords, popup=estacion, icon=folium.Icon(color='red')).add_to(mapa)
-        else:
-            folium.Marker(location=coords, popup=estacion).add_to(mapa)
     folium_static(mapa)
 
 # Mostrar el mapa y el selector de estación en Streamlit
@@ -37,7 +35,7 @@ estacion_seleccionada = st.selectbox("Estaciones:", list(estaciones.keys()))
 actualizar_mapa(estacion_seleccionada)
 
 # Opciones para ver el pronóstico
-opcion = st.radio("Mostrar prediccion sobre:", ["Próximos 7 días"])
+opcion = st.radio("Mostrar predicción sobre:", ["Próximos 7 días", "Seleccionar una fecha"])
 
 # Cargar las predicciones
 predicciones_path = os.path.join(os.getcwd(), 'predicciones')
@@ -54,6 +52,7 @@ dias_semana = {
     'Sunday': 'Domingo'
 }
 
+predicciones['Day of Week'] = predicciones.index.day_name()
 predicciones['Day of Week'] = predicciones['Day of Week'].map(dias_semana)
 predicciones['Date'] = predicciones.index.strftime('%d/%m/%Y')
 
@@ -81,11 +80,12 @@ if opcion == "Próximos 7 días":
     st.write(f"Pronóstico del tiempo para los próximos 7 días en {estacion_seleccionada}:")
     st.table(predicciones.head(7))
 else:
-    fecha_seleccionada = st.date_input("Seleccione una fecha dentro del próximo mes:", min_value=predicciones.index[0], max_value=predicciones.index[-1])
+    fecha_seleccionada = st.date_input("Seleccione una fecha dentro del próximo mes:", min_value=predicciones.index[0].date(), max_value=predicciones.index[-1].date())
     if fecha_seleccionada:
-        prediccion_dia = predicciones[predicciones.index == fecha_seleccionada]
+        prediccion_dia = predicciones[predicciones.index.date == fecha_seleccionada]
         if not prediccion_dia.empty:
             st.write(f"Pronóstico del tiempo para {fecha_seleccionada.strftime('%d/%m/%Y')} en {estacion_seleccionada}:")
             st.table(prediccion_dia)
         else:
             st.write(f"No hay datos de predicción para {fecha_seleccionada.strftime('%d/%m/%Y')}.")
+

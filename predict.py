@@ -8,8 +8,8 @@ predicciones_path = os.path.join(os.getcwd(), 'predicciones')
 if not os.path.exists(predicciones_path):
     os.makedirs(predicciones_path)
 
-# Determinar la última fecha en los datos originales
-last_date = pd.to_datetime('2023-06-10')  # Cambiar esta fecha a la última fecha de tu conjunto de datos
+# Determinar la fecha actual
+last_date = pd.to_datetime(datetime.now().date())
 
 # Generar predicciones para cada estación
 stations = [file.split('_')[0] for file in os.listdir('models') if file.endswith('_tmax.pkl')]
